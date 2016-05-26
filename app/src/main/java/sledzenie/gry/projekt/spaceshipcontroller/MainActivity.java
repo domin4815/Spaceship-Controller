@@ -6,6 +6,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,7 +18,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-public class MainActivity extends AppCompatActivity  implements SensorEventListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity  implements SensorEventListener, View.OnClickListener{
 
 
     //view
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     private Connector connector;
     private boolean connectionReady = false;
 
+    private int deltaSpeed = 0;
+
 
 
     @Override
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
 
 
         mSensorManager = (SensorManager) getSystemService(this.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
 
         Button submit = (Button) findViewById(R.id.submitButton);
         submit.setOnClickListener(this);
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
 
         if (connectionReady && connector != null){
             try {
-                connector.send("X: " + event.values[0]+", "+"Y: " + event.values[1]+", "+"Z: " + event.values[2]);
+                connector.send("X: " + event.values[0]+", "+"Y: " + event.values[1]+", "+"Z: " + event.values[2]+", DELTASPEED: "+deltaSpeed+" END");
                 if (connectedShow == false){
                     connectedShow = true;
                     connectedCheck.setChecked(true);
@@ -130,5 +133,22 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (KeyEvent.KEYCODE_VOLUME_UP == keyCode ){
+            deltaSpeed++;
+            Toast.makeText(this, "Speed up", Toast.LENGTH_SHORT).show();
+
+
+        } else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+            deltaSpeed--;
+            Toast.makeText(this, "Speed down", Toast.LENGTH_SHORT).show();
+
+
+        }
+        return true;
     }
 }
