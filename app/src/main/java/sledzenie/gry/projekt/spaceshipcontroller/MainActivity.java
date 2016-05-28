@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     private TextView xData;
     private TextView yData;
     private TextView zData;
+    private TextView speedText;
     private EditText ipEditText;
     private EditText portEditText;
     private CheckBox connectedCheck;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     private Connector connector;
     private boolean connectionReady = false;
 
-    private int deltaSpeed = 0;
+    private int speed = 0;
 
 
 
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
         xData = (TextView) findViewById(R.id.XtextView);
         yData = (TextView) findViewById(R.id.YtextView);
         zData = (TextView) findViewById(R.id.ZtextView);
+        speedText = (TextView) findViewById(R.id.speedTextView);
+
         ipEditText = (EditText) findViewById(R.id.IpEditText);
         portEditText = (EditText) findViewById(R.id.editTextPort);
 
@@ -74,7 +77,12 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
 
         if (connectionReady && connector != null){
             try {
-                connector.send("X: " + event.values[0]+", "+"Y: " + event.values[1]+", "+"Z: " + event.values[2]+", DELTASPEED: "+deltaSpeed+" END");
+                ControllerData controllerData = new ControllerData(event.values[0],
+                        event.values[1],
+                        event.values[2],
+                        new Float(speed));
+
+                connector.send(controllerData);
                 if (connectedShow == false){
                     connectedShow = true;
                     connectedCheck.setChecked(true);
@@ -139,16 +147,14 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
         if (KeyEvent.KEYCODE_VOLUME_UP == keyCode ){
-            deltaSpeed++;
-            Toast.makeText(this, "Speed up", Toast.LENGTH_SHORT).show();
-
-
+            speed++;
+            speedText.setText(""+speed);
+            return true;
         } else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-            deltaSpeed--;
-            Toast.makeText(this, "Speed down", Toast.LENGTH_SHORT).show();
-
-
+            speed--;
+            speedText.setText(""+speed);
+            return true;
         }
-        return true;
+        return false;
     }
 }

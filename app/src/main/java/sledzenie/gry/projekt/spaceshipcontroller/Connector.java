@@ -35,9 +35,9 @@ public class Connector {
 
     }
 
-    public void send(String data) throws IOException{
+    public void send(ControllerData controllerData) throws IOException{
 
-        final byte[] sendData  = data.getBytes();
+        final byte[] sendData  = controllerData.toBytes();
 
         Thread t = new Thread(){
             public void run() {
