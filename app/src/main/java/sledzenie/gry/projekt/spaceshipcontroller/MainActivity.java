@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
 
         Button submit = (Button) findViewById(R.id.submitButton);
         submit.setOnClickListener(this);
+        mSensorManager.registerListener(this,
+                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
 
 
     }
@@ -106,15 +109,19 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
         super.onResume();
         // register this class as a listener for the orientation and
         // accelerometer sensors
-        mSensorManager.registerListener(this,
-                mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     @Override
     protected void onPause() {
         // unregister listener
         super.onPause();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         mSensorManager.unregisterListener(this);
         connectionReady = false;
         if (connector !=  null){
@@ -147,13 +154,20 @@ public class MainActivity extends AppCompatActivity  implements SensorEventListe
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
         if (KeyEvent.KEYCODE_VOLUME_UP == keyCode ){
-            speed++;
-            speedText.setText(""+speed);
+            if (speed < 200){
+                speed += 10;
+                speedText.setText(""+speed);
+            }
+
             return true;
         } else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-            speed--;
-            speedText.setText(""+speed);
+            if (speed > 0){
+                speed -= 10;
+                speedText.setText(""+speed);
+                return true;
+            }
             return true;
+
         }
         return false;
     }
